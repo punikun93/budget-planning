@@ -67,32 +67,8 @@ const App = () => {
   const [wallet, setWallet] = useState(storedWallet);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // Mock function to simulate image search
-  const searchProductImage = async (name) => {
-    setLoading(true);
-    try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Simple logic to return placeholder images for specific items
-      if (name.toLowerCase().includes("advan")) {
-        return "/api/placeholder/200/200";
-      } else if (name.toLowerCase().includes("mountain")) {
-        return "/api/placeholder/200/200";
-      }
-      return null;
-    } catch (err) {
-      setError("Failed to load image suggestion");
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const addItem = async () => {
     if (newItem.name && newItem.price) {
-      const image = await searchProductImage(newItem.name);
       setItems([...items, { ...newItem, id: Date.now(), image }]);
       setNewItem({ name: "", price: "" });
     }
