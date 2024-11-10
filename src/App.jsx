@@ -67,9 +67,9 @@ const App = () => {
   const [wallet, setWallet] = useState(storedWallet);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const addItem = async () => {
+  const addItem = () => {
     if (newItem.name && newItem.price) {
-      setItems([...items, { ...newItem, id: Date.now(), image }]);
+      setItems([...items, { ...newItem, id: Date.now()}]);
       setNewItem({ name: "", price: "" });
     }
   };

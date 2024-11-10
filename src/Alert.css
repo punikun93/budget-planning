@@ -1,9 +1,0 @@
-.alert {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.alert-destructive {
-  background-color: #ffe5e5;
-  color: #d32f2f;
-}
