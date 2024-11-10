@@ -5,23 +5,18 @@ import {
   Calculator,
   DollarSign,
   Calendar,
-  Wallet,
   Sun,
   Moon,
-  AlertCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const App = () => {
   // Theme handling
   const [darkMode, setDarkMode] = useState(() => {
-    // Check localStorage first
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      return savedTheme === "dark";
-    }
-    // Otherwise use system preference
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return savedTheme
+      ? savedTheme === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
   // Listen for system theme changes
@@ -47,10 +42,7 @@ const App = () => {
     document.body.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  const storedItems = JSON.parse(localStorage.getItem("items")) || [
-    { id: 1, name: "Advan WorkPlus", price: 7800000 },
-    { id: 2, name: "Rinjani Mountain", price: 5000000 },
-  ];
+  const storedItems = JSON.parse(localStorage.getItem("items")) || [];
   const storedIncome = localStorage.getItem("income") || "";
   const storedSavingPercentage = localStorage.getItem("savingPercentage") || 20;
   const storedTimeUnit = localStorage.getItem("timeUnit") || "month";
@@ -64,13 +56,21 @@ const App = () => {
   );
   const [timeUnit, setTimeUnit] = useState(storedTimeUnit);
   const [wallet, setWallet] = useState(storedWallet);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const addItem = () => {
-    if (newItem.name && newItem.price) {
-      setItems([...items, { ...newItem, id: Date.now()}]);
-      setNewItem({ name: "", price: "" });
+    if (
+      !newItem.name ||
+      !newItem.price ||
+      isNaN(newItem.price) ||
+      newItem.price <= 0
+    ) {
+      setError("Please enter a valid item name and price.");
+      return;
     }
+    setItems([...items, { ...newItem, id: Date.now() }]);
+    setNewItem({ name: "", price: "" });
+    setError("");
   };
 
   useEffect(() => {
@@ -99,47 +99,47 @@ const App = () => {
 
   return (
     <div
-      className={`app-container ${
+      className={`${
         darkMode ? "dark" : "light"
-      } max-w-6xl mx-auto p-6`}
+      } min-h-screen w-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6`}
     >
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-center sm:text-left">
-          Budget Planner
-        </h1>
+      {/* Header */}
+      <header className="flex justify-between items-center mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold">Budget Planner</h1>
         <button
           onClick={toggleDarkMode}
-          className="p-2 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
         >
           {darkMode ? (
-            <Sun className="text-yellow-400" />
+            <Sun className="w-5 h-5 text-yellow-400" />
           ) : (
-            <Moon className="text-gray-600" />
+            <Moon className="w-5 h-5 text-gray-600" />
           )}
         </button>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6">
-        {/* Main Budget Section */}
-        <div className="p-6 rounded-lg shadow-lg bg-gradient-to-br from-indigo-100 to-blue-50 dark:from-gray-700 dark:to-gray-800">
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Calculator Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6">
           <h2 className="text-xl font-semibold mb-6">Budget Calculator</h2>
 
-          <div className="space-y-6">
-            {/* Income Input */}
-            <div className="flex items-center gap-2">
-              <DollarSign className="text-blue-600 dark:text-blue-400" />
+          {/* Income Input */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+              <DollarSign className="text-blue-600 dark:text-blue-400 w-5 h-5" />
               <input
                 type="number"
                 placeholder="Monthly Income"
                 value={income}
                 onChange={(e) => setIncome(e.target.value)}
-                className="flex-1 p-2 rounded-lg dark:bg-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-400 outline-none"
+                className="w-full bg-transparent focus:outline-none"
               />
             </div>
 
             {/* Savings Slider */}
             <div className="space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between text-sm">
                 <span>Savings Target</span>
                 <span className="font-semibold">{savingPercentage}%</span>
               </div>
@@ -149,20 +149,20 @@ const App = () => {
                 max="100"
                 value={savingPercentage}
                 onChange={(e) => setSavingPercentage(e.target.value)}
-                className="w-full"
+                className="w-full accent-blue-600"
               />
             </div>
 
             {/* Time Unit Selector */}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-wrap gap-2">
               {["day", "week", "month", "year"].map((unit) => (
                 <button
                   key={unit}
                   onClick={() => setTimeUnit(unit)}
-                  className={`px-3 py-1 rounded-full text-sm ${
+                  className={`px-4 py-2 rounded-lg text-sm transition-colors ${
                     timeUnit === unit
                       ? "bg-blue-600 text-white"
-                      : "bg-gray-200 dark:bg-gray-600"
+                      : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                   }`}
                 >
                   {unit.charAt(0).toUpperCase() + unit.slice(1)}
@@ -171,7 +171,7 @@ const App = () => {
             </div>
 
             {/* Add Item Form */}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
                 placeholder="Item Name"
@@ -179,7 +179,7 @@ const App = () => {
                 onChange={(e) =>
                   setNewItem({ ...newItem, name: e.target.value })
                 }
-                className="flex-1 p-2 rounded-lg dark:bg-gray-800 dark:text-gray-200"
+                className="flex-1 p-3 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <input
                 type="number"
@@ -188,25 +188,27 @@ const App = () => {
                 onChange={(e) =>
                   setNewItem({ ...newItem, price: e.target.value })
                 }
-                className="w-32 p-2 rounded-lg dark:bg-gray-800 dark:text-gray-200"
+                className="sm:w-32 p-3 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <motion.button
                 onClick={addItem}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                <PlusCircle />
+                <PlusCircle className="w-5 h-5" />
               </motion.button>
             </div>
+
+            {/* Error Message */}
+            {error && <p className="text-red-500 text-sm">{error}</p>}
           </div>
         </div>
 
-        {/* Items and Suggestions Section */}
-        <div className="p-6 rounded-lg shadow-lg bg-white dark:bg-gray-800">
+        {/* Items List */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6">
           <h2 className="text-xl font-semibold mb-6">Items & Suggestions</h2>
-
-          <div className="space-y-4">
+          <div className="space-y-3">
             <AnimatePresence>
               {items.map((item) => (
                 <motion.div
@@ -216,19 +218,20 @@ const App = () => {
                   exit={{ opacity: 0, x: -100 }}
                   className="p-4 flex items-center gap-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
                 >
-        
                   <div className="flex-1">
                     <h3 className="font-medium">{item.name}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       Rp {Number(item.price).toLocaleString("id-ID")}
                     </p>
                   </div>
-                  <button
+                  <motion.button
                     onClick={() => removeItem(item.id)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors"
                   >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
+                    <Trash2 className="w-5 h-5" />
+                  </motion.button>
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -237,7 +240,7 @@ const App = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
         <SummaryCard
           title="Total Target"
           value={`Rp ${totalTarget.toLocaleString("id-ID")}`}
@@ -262,14 +265,14 @@ const App = () => {
 
 const SummaryCard = ({ title, value, icon }) => (
   <motion.div
-    className="p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 flex items-center gap-4"
-    whileHover={{ scale: 1.02 }}
+    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 flex items-center gap-4"
+    whileHover={{ y: -2 }}
     transition={{ type: "spring", stiffness: 300 }}
   >
-    <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-700">{icon}</div>
-    <div>
+    <div className="p-3 rounded-full bg-gray-50 dark:bg-gray-700">{icon}</div>
+    <div className="flex-1 min-w-0">
       <h3 className="text-sm text-gray-600 dark:text-gray-400">{title}</h3>
-      <p className="text-lg font-semibold">{value}</p>
+      <p className="text-lg font-semibold truncate">{value}</p>
     </div>
   </motion.div>
 );
