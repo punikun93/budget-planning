@@ -8,7 +8,6 @@ import {
   Wallet,
   Sun,
   Moon,
-  Image as ImageIcon,
   AlertCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -49,8 +48,8 @@ const App = () => {
   }, [darkMode]);
 
   const storedItems = JSON.parse(localStorage.getItem("items")) || [
-    { id: 1, name: "Advan WorkPlus", price: 7800000, image: null },
-    { id: 2, name: "Rinjani Mountain", price: 5000000, image: null },
+    { id: 1, name: "Advan WorkPlus", price: 7800000 },
+    { id: 2, name: "Rinjani Mountain", price: 5000000 },
   ];
   const storedIncome = localStorage.getItem("income") || "";
   const storedSavingPercentage = localStorage.getItem("savingPercentage") || 20;
@@ -217,13 +216,7 @@ const App = () => {
                   exit={{ opacity: 0, x: -100 }}
                   className="p-4 flex items-center gap-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
                 >
-                  {item.image && (
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  )}
+        
                   <div className="flex-1">
                     <h3 className="font-medium">{item.name}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
